@@ -102,14 +102,6 @@ npm run dev
 http://localhost:5173
 
 ### Authentication
-Demo Account
-
-You can log in using:
-
-Email: hahn@gmail.com
-Password: hahn123
-
-Or
 
 You can register a new account directly from the application.
 
@@ -160,7 +152,7 @@ Frontend tested manually through UI
 
 🎥 Demo
 
-A demo video is provided showing:
+A demo video is provided showing: https://drive.google.com/file/d/1pxQa4tkkqjCKJ3xC2w57BsTA2fWyvQXq/view?usp=sharing
 
 Authentication
 
