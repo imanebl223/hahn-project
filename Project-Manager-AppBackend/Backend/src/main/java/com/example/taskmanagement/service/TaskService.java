@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -57,6 +58,56 @@ public class TaskService {
     public void deleteTask(@NotNull Long taskId, @NonNull String userEmail) {
         Task task = getTaskByIdAndUserEmail(taskId, userEmail);
         taskRepository.delete(task);
+    }
+
+    @Transactional(readOnly = true)
+    public Optional<Task> getTask(@NotNull Long taskId, @NonNull String userEmail) {
+        if (taskId == null || userEmail == null) {
+            throw new IllegalArgumentException("Task ID and user email must not be null");
+        }
+        
+        try {
+            Task task = getTaskByIdAndUserEmail(taskId, userEmail);
+            return Optional.of(task);
+        } catch (EntityNotFoundException e) {
+            return Optional.empty();
+        }
+    }
+
+    @Transactional
+    public Optional<Task> updateTask(@NotNull Long taskId, @NonNull Task taskDetails, @NonNull String userEmail) {
+        if (taskId == null || taskDetails == null || userEmail == null) {
+            throw new IllegalArgumentException("Parameters must not be null");
+        }
+
+        return taskRepository.findById(taskId)
+                .map(existingTask -> {
+                    // Verify the task belongs to the user's project
+                    if (existingTask.getProject() == null || 
+                        !projectService.isProjectOwnedByUser(existingTask.getProject().getId(), userEmail)) {
+                        throw new EntityNotFoundException("Task not found");
+                    }
+
+                    // Update task properties
+                    if (taskDetails.getTitle() != null) {
+                        existingTask.setTitle(taskDetails.getTitle());
+                    }
+                    if (taskDetails.getDescription() != null) {
+                        existingTask.setDescription(taskDetails.getDescription());
+                    }
+                    if (taskDetails.getDueDate() != null) {
+                        existingTask.setDueDate(taskDetails.getDueDate());
+                    }
+                    if (taskDetails.getPriority() != null) {
+                        existingTask.setPriority(taskDetails.getPriority());
+                    }
+                    if (taskDetails.getStatus() != null) {
+                        existingTask.setStatus(taskDetails.getStatus());
+                    }
+                    existingTask.setCompleted(taskDetails.isCompleted());
+                    
+                    return taskRepository.save(existingTask);
+                });
     }
 
     private Task getTaskByIdAndUserEmail(@NotNull Long taskId, @NonNull String userEmail) {

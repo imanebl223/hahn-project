@@ -24,7 +24,6 @@ public class TaskController {
 
     private final TaskService taskService;
 
-    @SuppressWarnings("null")
     @GetMapping
     public List<TaskDTO> getProjectTasks(
             @PathVariable @NotNull Long projectId, 
@@ -35,7 +34,17 @@ public class TaskController {
                 .collect(Collectors.toList());
     }
 
-    @SuppressWarnings("null")
+    @GetMapping("/{taskId}")
+    public ResponseEntity<TaskDTO> getTask(
+            @PathVariable @NotNull Long projectId,
+            @PathVariable @NotNull Long taskId,
+            @NonNull Authentication authentication) {
+        return taskService.getTask(taskId, authentication.getName())
+                .map(TaskDTO::from)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     @PostMapping
     public ResponseEntity<TaskDTO> createTask(
             @PathVariable @NotNull Long projectId, 
@@ -53,7 +62,18 @@ public class TaskController {
         return ResponseEntity.created(location).body(taskDTO);
     }
 
-    @SuppressWarnings("null")
+    @PutMapping("/{taskId}")
+    public ResponseEntity<TaskDTO> updateTask(
+            @PathVariable @NotNull Long projectId,
+            @PathVariable @NotNull Long taskId,
+            @RequestBody @NotNull Task task,
+            @NonNull Authentication authentication) {
+        return taskService.updateTask(taskId, task, authentication.getName())
+                .map(TaskDTO::from)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
     @PutMapping("/{taskId}/complete")
     public ResponseEntity<Void> markTaskAsCompleted(
             @PathVariable @NotNull Long projectId, 
@@ -63,7 +83,6 @@ public class TaskController {
         return ResponseEntity.ok().build();
     }
 
-    @SuppressWarnings("null")
     @DeleteMapping("/{taskId}")
     public ResponseEntity<Void> deleteTask(
             @PathVariable @NotNull Long projectId,
