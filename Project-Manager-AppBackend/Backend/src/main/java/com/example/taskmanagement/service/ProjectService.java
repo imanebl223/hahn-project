@@ -3,6 +3,7 @@ package com.example.taskmanagement.service;
 import com.example.taskmanagement.model.Project;
 import com.example.taskmanagement.model.User;
 import com.example.taskmanagement.repository.ProjectRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,26 +20,29 @@ public class ProjectService {
 
     @Transactional(readOnly = true)
     public List<Project> getUserProjects(String userEmail) {
-        User user = userService.getUserByEmail(userEmail);
-        return projectRepository.findByUser(user);
+        return userService.findByEmail(userEmail)
+                .map(user -> projectRepository.findByUser(user))
+                .orElseThrow(() -> new EntityNotFoundException("User not found with email: " + userEmail));
     }
 
     @Transactional(readOnly = true)
     public Optional<Project> getProject(Long projectId, String userEmail) {
-        User user = userService.getUserByEmail(userEmail);
-        return projectRepository.findByIdAndUser(projectId, user);
+        return userService.findByEmail(userEmail)
+                .flatMap(user -> projectRepository.findByIdAndUser(projectId, user));
     }
 
     @Transactional
     public Project createProject(Project project, String userEmail) {
-        User user = userService.getUserByEmail(userEmail);
+        User user = userService.findByEmail(userEmail)
+                .orElseThrow(() -> new EntityNotFoundException("User not found with email: " + userEmail));
         project.setUser(user);
         return projectRepository.save(project);
     }
 
     @Transactional(readOnly = true)
     public boolean isProjectOwnedByUser(Long projectId, String userEmail) {
-        User user = userService.getUserByEmail(userEmail);
-        return projectRepository.existsByIdAndUser(projectId, user);
+        return userService.findByEmail(userEmail)
+                .map(user -> projectRepository.existsByIdAndUser(projectId, user))
+                .orElse(false);
     }
 }
