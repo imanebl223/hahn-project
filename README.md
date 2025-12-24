@@ -61,7 +61,7 @@ Project-Task-Manager
 
 ---
 
-## ⚙️ Backend Setup
+## ⚙️ Backend AND Frontend Setup
 
 ###  Configure PostgreSQL
 Create a PostgreSQL database:
