@@ -60,6 +60,9 @@ Project-Task-Manager
 └── README.md
 
 ---
+🎥 Demo
+
+A demo video is provided showing: https://drive.google.com/file/d/1pxQa4tkkqjCKJ3xC2w57BsTA2fWyvQXq/view?usp=sharing
 
 ## ⚙️ Backend AND Frontend Setup
 
@@ -150,9 +153,7 @@ Backend APIs tested using Postman
 
 Frontend tested manually through UI
 
-🎥 Demo
 
-A demo video is provided showing: https://drive.google.com/file/d/1pxQa4tkkqjCKJ3xC2w57BsTA2fWyvQXq/view?usp=sharing
 
 Authentication
 
